@@ -402,7 +402,7 @@ def download_exercise_images(
             continue
         except ExerciseImage.DoesNotExist:
             print_fn('    Image not found in local DB, creating now...')
-            retrieved_image = requests.get(image_data['image'], headers=headers)
+            retrieved_image = requests.get(image_data['image'], headers=headers, timeout=60)
             image = ExerciseImage.from_json(exercise, retrieved_image, image_data)
 
         print_fn(style_fn('    successfully saved'))
@@ -449,7 +449,7 @@ def download_exercise_videos(
 
         # Save the downloaded video
         # http://stackoverflow.com/questions/1308386/programmatically-saving-image-to-
-        retrieved_video = requests.get(video_data['video'], headers=headers)
+        retrieved_video = requests.get(video_data['video'], headers=headers, timeout=60)
 
         # Temporary files on Windows don't support the delete attribute
         if os.name == 'nt':

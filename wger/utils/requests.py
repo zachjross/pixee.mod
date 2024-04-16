@@ -40,7 +40,7 @@ def get_all_paginated(url: str, headers=None):
 
     results = []
     while True:
-        response = requests.get(url, headers=headers).json()
+        response = requests.get(url, headers=headers, timeout=60).json()
         url = response['next']
         results.extend(response['results'])
 
@@ -61,7 +61,7 @@ def get_paginated(url: str, headers=None):
         headers = {}
 
     while True:
-        response = requests.get(url, headers=headers).json()
+        response = requests.get(url, headers=headers, timeout=60).json()
 
         for result in response['results']:
             yield result
