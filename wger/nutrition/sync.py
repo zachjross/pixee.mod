@@ -78,7 +78,7 @@ def fetch_ingredient_image(pk: int):
 def fetch_image_from_wger_instance(ingredient):
     url = make_uri(IMAGE_ENDPOINT, query={'ingredient__uuid': ingredient.uuid})
     logger.info(f'Trying to fetch image from WGER for {ingredient.name} (UUID: {ingredient.uuid})')
-    result = requests.get(url, headers=wger_headers()).json()
+    result = requests.get(url, headers=wger_headers(), timeout=60).json()
     if result['count'] == 0:
         logger.info('No ingredient matches UUID in the remote server')
 
@@ -89,7 +89,7 @@ def fetch_image_from_wger_instance(ingredient):
         logger.info('image already present locally, skipping...')
         return
     except Image.DoesNotExist:
-        retrieved_image = requests.get(image_data['image'], headers=wger_headers())
+        retrieved_image = requests.get(image_data['image'], headers=wger_headers(), timeout=60)
         Image.from_json(ingredient, retrieved_image, image_data)
 
 
@@ -103,7 +103,7 @@ def fetch_image_from_off(ingredient):
 
     url = ingredient.source_url + '?fields=images,image_front_url'
     headers = wger_headers()
-    product_data = requests.get(url, headers=headers).json()
+    product_data = requests.get(url, headers=headers, timeout=60).json()
 
     try:
         image_url: Optional[str] = product_data['product'].get('image_front_url')
@@ -117,7 +117,7 @@ def fetch_image_from_off(ingredient):
     image_data = product_data['product']['images']
 
     # Download the image file
-    response = requests.get(image_url, headers=headers)
+    response = requests.get(image_url, headers=headers, timeout=60)
     if response.status_code != 200:
         logger.info(f'An error occurred! Status code: {response.status_code}')
         return
@@ -188,7 +188,7 @@ def download_ingredient_images(
             continue
         except Image.DoesNotExist:
             print_fn('    Image not found in local DB, creating now...')
-            retrieved_image = requests.get(image_data['image'], headers=headers)
+            retrieved_image = requests.get(image_data['image'], headers=headers, timeout=60)
             Image.from_json(ingredient, retrieved_image, image_data)
 
         print_fn(style_fn('    successfully saved'))

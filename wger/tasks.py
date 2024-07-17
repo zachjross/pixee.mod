@@ -263,7 +263,7 @@ def load_online_fixtures(context, settings_path=None):
         url = f'{FIXTURE_URL}{name}.json.zip'
 
         print(f'Downloading fixture data from {url}...')
-        response = requests.get(url, stream=True)
+        response = requests.get(url, stream=True, timeout=60)
         total_size = int(response.headers.get('content-length', 0))
         size = int(response.headers['content-length']) / (1024 * 1024)
         print(f'-> fixture size: {size:.3} MB')
